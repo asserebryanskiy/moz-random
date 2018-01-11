@@ -89,7 +89,6 @@ public class GeneratorController {
         audio = new MediaPlayer(new Media(getClass().getResource("/media/waltz.mp3").toExternalForm()));
 //        audio.setStopTime(Duration.millis(6500));
         audio.setCycleCount(MediaPlayer.INDEFINITE);
-        audio.setMute(true);
 
 
         // set up random number generation animation
@@ -160,7 +159,7 @@ public class GeneratorController {
         }
         Stage stage = (Stage) ((Node) mouseEvent.getSource()).getScene().getWindow();
         stage.setScene(new Scene(root));
-        stage.setWidth(389);
+        stage.setWidth(400);
         stage.centerOnScreen();
     }
 
