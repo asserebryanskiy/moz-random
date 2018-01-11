@@ -1,0 +1,27 @@
+* {
+    -fx-font-family: "Circe Light";
+    -fx-text-fill: white;
+    -fx-background-color: rgb(78,53,73);
+}
+
+.label {
+    -fx-font-size: 20;
+}
+
+.text-field {
+    -fx-font-size: 40;
+}
+
+.check-box {
+    -fx-font-size: 16;
+}
+
+.check-box .box {
+    -fx-border-width: 1;
+    -fx-border-color: gray;
+    -fx-border-radius: 3;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: white;
+}

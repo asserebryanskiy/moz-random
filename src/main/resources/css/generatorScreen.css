@@ -1,0 +1,30 @@
+* {
+    -fx-font-family: "Circe Light";
+
+}
+
+#number {
+    -fx-font-size: 240;
+    -fx-text-fill: white;
+}
+
+.button {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgb(124,121,121, 0.5);
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-text-fill: white;
+}
+
+.btn {
+    -fx-fill: rgb(124,121,121, 0.5);
+    -fx-cursor: hand;
+}
+
+.btn:hover {
+    -fx-fill: rgb(124,121,121, 0.9);
+}
+
+

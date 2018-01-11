@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#handleProceed" spacing="5.0" stylesheets="@../css/choiceScreen.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.RangeChoiceController">
+   <children>
+      <Label text="Сгенерировать случайные числа с " />
+      <TextField fx:id="minField" alignment="CENTER" prefWidth="50.0" />
+      <Label text="по" />
+      <TextField fx:id="maxField" alignment="CENTER" prefWidth="50.0" />
+      <CheckBox mnemonicParsing="false" onAction="#handleChangeAllowRepeats" text="Не допускать повторы" />
+   </children>
+   <padding>
+      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+   </padding>
+</VBox>
