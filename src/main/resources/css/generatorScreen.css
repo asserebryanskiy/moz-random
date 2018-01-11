@@ -27,4 +27,8 @@
     -fx-fill: rgb(124,121,121, 0.9);
 }
 
+#shutter {
+    -fx-background-color: rgb(124,121,121);
+}
+
 

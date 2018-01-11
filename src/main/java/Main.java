@@ -14,6 +14,7 @@ public class Main extends Application {
         Parent root = FXMLLoader.load(getClass().getResource("/fxml/RangeChoice.fxml"));
         primaryStage.setScene(new Scene(root));
         primaryStage.setTitle("МОЗ Генератор случайных чисел");
+        primaryStage.setResizable(false);
         primaryStage.show();
     }
 }
