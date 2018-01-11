@@ -64,6 +64,7 @@ public class RangeChoiceController implements Initializable{
             Stage oldStage = (Stage) ((Node) keyEvent.getSource()).getScene().getWindow();
             Stage stage = new Stage();
             stage.getIcons().addAll(oldStage.getIcons());
+            stage.setTitle(oldStage.getTitle());
             oldStage.close();
             controller.init(new RandomGenerator(min, max, disallowRepeats), disallowRepeats);
             stage.setScene(new Scene(root, 800, 600));
