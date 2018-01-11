@@ -23,9 +23,9 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>8.8.3</version>
                 <configuration>
-                    <mainClass>badgegenerator.Main</mainClass>
+                    <mainClass>Main</mainClass>
                     <vendor>company</vendor>
-                    <appName>BG</appName>
+                    <appName>moz-random</appName>
                     <bundler>EXE</bundler>
                     <verbose>true</verbose>
                 </configuration>
