@@ -1,6 +1,7 @@
 * {
     -fx-font-family: "Circe Light";
-
+    gray-color-transparent: rgb(124,121,121, 0.5);
+    gray-color: rgb(124,121,121);
 }
 
 #number {
@@ -10,7 +11,7 @@
 
 .button {
     -fx-background-color: transparent;
-    -fx-text-fill: rgb(124,121,121, 0.5);
+    -fx-text-fill: gray-color-transparent;
     -fx-cursor: hand;
 }
 
@@ -19,16 +20,24 @@
 }
 
 .btn {
-    -fx-fill: rgb(124,121,121, 0.5);
+    -fx-fill: gray-color-transparent;
     -fx-cursor: hand;
 }
 
 .btn:hover {
-    -fx-fill: rgb(124,121,121, 0.9);
+    -fx-fill: black;
 }
 
-#shutter {
-    -fx-background-color: rgb(124,121,121);
+.slider .track {
+    -fx-background-color: gray-color-transparent;
+}
+
+.slider .thumb {
+    -fx-background-color: gray-color;
+}
+
+.slider:hover .thumb {
+    -fx-background-color: black;
 }
 
 

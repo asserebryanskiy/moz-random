@@ -11,9 +11,11 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.media.*;
@@ -32,9 +34,10 @@ import java.util.TimerTask;
  * Created by andreyserebryanskiy on 10/01/2018.
  */
 public class GeneratorController {
-    private final int OFFSET_FROM_BORDER = 20;
-    private final String MUTE_SVG_PATH = "M5 17h-5v-10h5v10zm2-10v10l9 5v-20l-9 5zm15.324 4.993l1.646-1.659-1.324-1.324-1.651 1.67-1.665-1.648-1.316 1.318 1.67 1.657-1.65 1.669 1.318 1.317 1.658-1.672 1.666 1.653 1.324-1.325-1.676-1.656z";
-    private final String SOUND_SVG_PATH = "M5 17h-5v-10h5v10zm2-10v10l9 5v-20l-9 5zm17 4h-5v2h5v-2zm-1.584-6.232l-4.332 2.5 1 1.732 4.332-2.5-1-1.732zm1 12.732l-4.332-2.5-1 1.732 4.332 2.5 1-1.732z";
+    private static final int TOP_PANEL_HEIGHT = 22;     // height of the OS panel with controls such as "close", "full-screen", etc.
+    private static final int OFFSET_FROM_BORDER = 20;   // offset from nearest border (either vertical or horizontal)
+    private static final String MUTE_SVG_PATH = "M5 17h-5v-10h5v10zm2-10v10l9 5v-20l-9 5zm15.324 4.993l1.646-1.659-1.324-1.324-1.651 1.67-1.665-1.648-1.316 1.318 1.67 1.657-1.65 1.669 1.318 1.317 1.658-1.672 1.666 1.653 1.324-1.325-1.676-1.656z";
+    private static final String SOUND_SVG_PATH = "M5 17h-5v-10h5v10zm2-10v10l9 5v-20l-9 5zm17 4h-5v2h5v-2zm-1.584-6.232l-4.332 2.5 1 1.732 4.332-2.5-1-1.732zm1 12.732l-4.332-2.5-1 1.732 4.332 2.5 1-1.732z";
 
     public StackPane root;
     public MediaView mediaView;
@@ -42,6 +45,8 @@ public class GeneratorController {
     public SVGPath backBtn;
     public Button startBtn;
     public SVGPath muteSvg;
+    public HBox audioControls;
+    public Slider volumeSlider;
 
     private MediaPlayer video;
     private boolean run;
@@ -49,6 +54,7 @@ public class GeneratorController {
     private RandomGenerator generator;
     private boolean disallowRepeats;
     private MediaPlayer audio;
+//    private double sliderPrevValue;     // last value of slider before it was positioned to zero
 
     public void init(RandomGenerator generator, boolean disallowRepeats) {
         Image image = new Image(getClass().getResource("/media/logo.png").toString());
@@ -59,16 +65,18 @@ public class GeneratorController {
             double newFitWidth = newValue.doubleValue() * 0.3;
             imageView.setFitWidth(newFitWidth);
             imageView.setLayoutX((newValue.doubleValue() - newFitWidth) / 2);
-            System.out.println(imageView.getFitWidth());
         });
         imageView.setLayoutY(OFFSET_FROM_BORDER);
         root.getChildren().add(imageView);
 
         backBtn.setManaged(false);
-        muteSvg.setManaged(false);
-        muteSvg.setLayoutY(OFFSET_FROM_BORDER);
-        muteSvg.layoutXProperty().bind(root.maxWidthProperty()
-                .subtract(OFFSET_FROM_BORDER + muteSvg.getBoundsInLocal().getWidth()));
+        audioControls.setManaged(false);
+        double height = audioControls.getBoundsInLocal().getHeight();
+        audioControls.layoutYProperty().bind(root.maxHeightProperty()
+                .subtract(OFFSET_FROM_BORDER + height + TOP_PANEL_HEIGHT));
+        audioControls.setLayoutX(OFFSET_FROM_BORDER);
+        volumeSlider.setMax(1);
+        volumeSlider.setValue(1);
 
         // set up video
         Media media = new Media(getClass().getResource("/media/video.mp4").toExternalForm());
@@ -89,6 +97,7 @@ public class GeneratorController {
         audio = new MediaPlayer(new Media(getClass().getResource("/media/waltz.mp3").toExternalForm()));
 //        audio.setStopTime(Duration.millis(6500));
         audio.setCycleCount(MediaPlayer.INDEFINITE);
+        audio.volumeProperty().bind(volumeSlider.valueProperty());
 
 
         // set up random number generation animation
@@ -159,14 +168,16 @@ public class GeneratorController {
         }
         Stage stage = (Stage) ((Node) mouseEvent.getSource()).getScene().getWindow();
         stage.setScene(new Scene(root));
+        stage.setResizable(false);
         stage.setWidth(400);
         stage.centerOnScreen();
     }
 
-    public void handleMute(KeyEvent keyEvent) {
+    public void handleApplyKeyboardShortcut(KeyEvent keyEvent) {
         if (keyEvent.getCharacter().equals("m") || keyEvent.getCharacter().equals("ь")) {
             changeMute();
         }
+//        else if (keyEvent.getCharacter().equals(" ")) handleGenerate();
     }
 
     public void handleMuteFromBtn() {
