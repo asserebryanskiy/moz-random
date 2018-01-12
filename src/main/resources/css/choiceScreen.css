@@ -25,3 +25,12 @@
 .check-box:selected .mark {
     -fx-background-color: white;
 }
+
+#btnNext {
+    -fx-fill: rgb(255,255,255);
+    -fx-cursor: hand;
+}
+
+#btnNext:hover {
+    -fx-fill: rgb(255,255,255, 0.5);
+}

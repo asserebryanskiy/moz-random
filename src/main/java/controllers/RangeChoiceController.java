@@ -4,6 +4,7 @@ import javafx.animation.ScaleTransition;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Point2D;
@@ -18,6 +19,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.SVGPath;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import model.RandomGenerator;
@@ -39,39 +41,43 @@ public class RangeChoiceController implements Initializable{
     private Line maxFieldLine;
 
     public void handleProceed(KeyEvent keyEvent) {
-        if (minField.getText().isEmpty() || maxField.getText().isEmpty()) return;
         if (keyEvent.getCode().equals(KeyCode.ENTER)) {
-            int min = Integer.parseInt(minField.getText());
-            int max = Integer.parseInt(maxField.getText());
-            if (min >= max) {
-                Alert alert = new Alert(Alert.AlertType.WARNING,
-                        "Верхняя граница должна быть больше нижней");
-                alert.show();
-                return;
-            }
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Generator.fxml"));
-            Parent root;
-            try {
-                root = loader.load();
-            } catch (IOException e) {
-                e.printStackTrace();
-                Alert alert = new Alert(Alert.AlertType.ERROR,
-                        "Не удалось загрузить окно генератора случайных чисел");
-                alert.show();
-                return;
-            }
-            GeneratorController controller = loader.getController();
-            Stage oldStage = (Stage) ((Node) keyEvent.getSource()).getScene().getWindow();
-            Stage stage = new Stage();
-            stage.getIcons().addAll(oldStage.getIcons());
-            stage.setTitle(oldStage.getTitle());
-            oldStage.close();
-            controller.init(new RandomGenerator(min, max, disallowRepeats), disallowRepeats);
-            stage.setScene(new Scene(root, 800, 600));
-            stage.show();
-            stage.setResizable(true);
-            stage.centerOnScreen();
+            proceed(keyEvent);
         }
+    }
+
+    private void proceed(Event event) {
+        if (minField.getText().isEmpty() || maxField.getText().isEmpty()) return;
+        int min = Integer.parseInt(minField.getText());
+        int max = Integer.parseInt(maxField.getText());
+        if (min >= max) {
+            Alert alert = new Alert(Alert.AlertType.WARNING,
+                    "Верхняя граница должна быть больше нижней");
+            alert.show();
+            return;
+        }
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Generator.fxml"));
+        Parent root;
+        try {
+            root = loader.load();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR,
+                    "Не удалось загрузить окно генератора случайных чисел");
+            alert.show();
+            return;
+        }
+        GeneratorController controller = loader.getController();
+        Stage oldStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        Stage stage = new Stage();
+        stage.getIcons().addAll(oldStage.getIcons());
+        stage.setTitle(oldStage.getTitle());
+        oldStage.close();
+        controller.init(new RandomGenerator(min, max, disallowRepeats), disallowRepeats);
+        stage.setScene(new Scene(root, 800, 600));
+        stage.show();
+        stage.setResizable(true);
+        stage.centerOnScreen();
     }
 
     public void handleChangeAllowRepeats(ActionEvent actionEvent) {
@@ -81,6 +87,8 @@ public class RangeChoiceController implements Initializable{
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         double rootWidth = 400;
+        double rootHeight = 332;
+        System.out.println(rootHeight);
 
         setUpField(minField);
         setUpField(maxField);
@@ -98,6 +106,19 @@ public class RangeChoiceController implements Initializable{
         maxFieldLine.setManaged(false);
         maxFieldLine.setStroke(Color.WHITE);
         root.getChildren().add(maxFieldLine);
+
+        SVGPath btnNext = new SVGPath();
+        btnNext.setContent("M24 12l-12-9v5h-12v8h12v5l12-9z");
+        btnNext.setId("btnNext");
+        btnNext.setManaged(false);
+        double scale = 1.5;
+        double btnSize = 24 * scale;
+        btnNext.setScaleX(scale);
+        btnNext.setScaleY(scale);
+        btnNext.setLayoutX(rootWidth - btnSize - 20);
+        btnNext.setLayoutY(rootHeight - btnSize - 20);
+        btnNext.setOnMouseClicked(this::proceed);
+        root.getChildren().add(btnNext);
     }
 
     private void setUpField(final TextField textField) {
