@@ -6,7 +6,7 @@
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{B571AF34-9C4E-4BA5-A244-B3333C06F56A}
-AppName=Генератор случайных чисел
+AppName=Random Numbers Generator
 AppVersion=1.0
 ;AppVerName=moz-random 1.0
 AppPublisher=SC
