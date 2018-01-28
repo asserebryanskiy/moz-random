@@ -13,7 +13,7 @@
       <MediaView fx:id="mediaView" fitHeight="200.0" fitWidth="200.0" />
       <VBox fx:id="numberBack" alignment="CENTER" spacing="10.0">
          <children>
-            <Label fx:id="number" text="Label" />
+            <Label fx:id="number" graphicTextGap="0.0" text="Label" />
             <Button fx:id="startBtn" mnemonicParsing="false" onAction="#handleGenerate" text="Генерировать" />
          </children>
       </VBox>
