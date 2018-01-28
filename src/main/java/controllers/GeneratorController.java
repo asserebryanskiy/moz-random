@@ -3,71 +3,55 @@ package controllers;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.*;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.media.*;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
 import javafx.scene.shape.SVGPath;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Duration;
 import model.RandomGenerator;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Timer;
-import java.util.TimerTask;
 
-/**
- * Created by andreyserebryanskiy on 10/01/2018.
- */
 public class GeneratorController {
     private static final int TOP_PANEL_HEIGHT = 22;     // height of the OS panel with controls such as "close", "full-screen", etc.
     private static final int OFFSET_FROM_BORDER = 20;   // offset from nearest border (either vertical or horizontal)
     private static final String MUTE_SVG_PATH = "M5 17h-5v-10h5v10zm2-10v10l9 5v-20l-9 5zm15.324 4.993l1.646-1.659-1.324-1.324-1.651 1.67-1.665-1.648-1.316 1.318 1.67 1.657-1.65 1.669 1.318 1.317 1.658-1.672 1.666 1.653 1.324-1.325-1.676-1.656z";
     private static final String SOUND_SVG_PATH = "M5 17h-5v-10h5v10zm2-10v10l9 5v-20l-9 5zm17 4h-5v2h5v-2zm-1.584-6.232l-4.332 2.5 1 1.732 4.332-2.5-1-1.732zm1 12.732l-4.332-2.5-1 1.732 4.332 2.5 1-1.732z";
+    private static final double TEXT_HEIGHT_RATIO = 75d/190d;  // ratio of text height relative to video height
+    private static final String MUSIC_SRC = "/media/fort-boyard-monety.mp3";
+    private static final String VIDEO_SRC = "/media/video_moz.mp4";
 
     public StackPane root;
     public MediaView mediaView;
-    public Label number;
     public SVGPath backBtn;
+    public Label number;
     public Button startBtn;
     public SVGPath muteSvg;
     public HBox audioControls;
-    public Slider volumeSlider;
 
+    public Slider volumeSlider;
     private MediaPlayer video;
     private boolean run;
     private Timeline animation;
     private RandomGenerator generator;
     private boolean disallowRepeats;
     private MediaPlayer audio;
-//    private double sliderPrevValue;     // last value of slider before it was positioned to zero
 
     public void init(RandomGenerator generator, boolean disallowRepeats) {
-        Image image = new Image(getClass().getResource("/media/logo.png").toString());
-        ImageView imageView = new ImageView(image);
-        imageView.setManaged(false);
-        imageView.setPreserveRatio(true);
-        root.maxWidthProperty().addListener((observable, oldValue, newValue) -> {
-            double newFitWidth = newValue.doubleValue() * 0.3;
-            imageView.setFitWidth(newFitWidth);
-            imageView.setLayoutX((newValue.doubleValue() - newFitWidth) / 2);
-        });
-        imageView.setLayoutY(OFFSET_FROM_BORDER);
-        root.getChildren().add(imageView);
+//        initLogo();
 
         backBtn.setManaged(false);
         audioControls.setManaged(false);
@@ -77,16 +61,12 @@ public class GeneratorController {
         audioControls.setLayoutX(OFFSET_FROM_BORDER);
         volumeSlider.setMax(1);
         volumeSlider.setValue(1);
+        // to make available clicking space to start/stop playing
+        volumeSlider.setOnMouseReleased(e -> startBtn.requestFocus());
 
         // set up video
-        Media media = new Media(getClass().getResource("/media/video.mp4").toExternalForm());
-        media.heightProperty().addListener((observable, oldValue, newValue) -> {
-            correctVideoSize(media, newValue.doubleValue());
-        });
-        /*Platform.runLater(() -> {
-            Stage stage = (Stage) root.getScene().getWindow();
-
-        });*/
+        Media media = new Media(getClass().getResource(VIDEO_SRC).toExternalForm());
+        media.heightProperty().addListener((observable, oldValue, newValue) -> correctVideoSize(media));
         video = new MediaPlayer(media);
         video.setMute(true);
         video.setCycleCount(MediaPlayer.INDEFINITE);
@@ -94,8 +74,8 @@ public class GeneratorController {
         mediaView.setManaged(false);
 
         // set up sound
-        audio = new MediaPlayer(new Media(getClass().getResource("/media/waltz.mp3").toExternalForm()));
-//        audio.setStopTime(Duration.millis(6500));
+        audio = new MediaPlayer(new Media(getClass().getResource(MUSIC_SRC).toExternalForm()));
+        audio.setStartTime(Duration.millis(15000));
         audio.setCycleCount(MediaPlayer.INDEFINITE);
         audio.volumeProperty().bind(volumeSlider.valueProperty());
 
@@ -116,21 +96,44 @@ public class GeneratorController {
             Stage stage = (Stage) root.getScene().getWindow();
             root.maxWidthProperty().bind(stage.widthProperty());
             root.maxHeightProperty().bind(stage.heightProperty());
-            stage.heightProperty().addListener((obs, n, o) -> correctVideoSize(media, media.getHeight()));
+            stage.heightProperty().addListener((obs, n, o) -> correctVideoSize(media));
             stage.setWidth(stage.getWidth() + 1);
             play();
         });
 
     }
 
-    private void correctVideoSize(Media media, double newValue) {
+    /*private void initLogo() {
+        Image image = new Image(getClass().getResource("/media/logo.png").toString());
+        ImageView imageView = new ImageView(image);
+        imageView.setManaged(false);
+        imageView.setPreserveRatio(true);
+        root.maxWidthProperty().addListener((observable, oldValue, newValue) -> {
+            double newFitWidth = newValue.doubleValue() * 0.3;
+            imageView.setFitWidth(newFitWidth);
+            imageView.setLayoutX((newValue.doubleValue() - newFitWidth) / 2);
+        });
+        imageView.setLayoutY(OFFSET_FROM_BORDER);
+        root.getChildren().add(imageView);
+    }*/
+
+    private void correctVideoSize(Media media) {
         Window window = root.getScene().getWindow();
         if (window != null) {
-            double newHeight = Math.min(window.getHeight(), newValue);
-            mediaView.setFitHeight(newHeight);
+            // if both video width and height are bigger we set height and then move video on X axis
+            double ratio = window.getHeight() / media.getHeight();
+            // scale to the size of the screen
+            mediaView.setFitHeight(window.getHeight());
+            double newFitWidth = media.getWidth() * ratio;
+            mediaView.setFitWidth(newFitWidth);
 
-            double newWidth = media.getWidth() * (newHeight / newValue);
-            mediaView.setFitWidth(newWidth);
+            // center on X axis
+            mediaView.setLayoutX((window.getWidth() - newFitWidth) / 2);
+
+            // change size of the text
+            double newFontSize = window.getHeight() * TEXT_HEIGHT_RATIO;
+            number.setStyle("-fx-font-size:" + newFontSize);
+            number.setTranslateY(newFontSize * 0.15);   // because it runs into logo if not
         }
     }
 
@@ -182,6 +185,7 @@ public class GeneratorController {
 
     public void handleMuteFromBtn() {
         changeMute();
+        startBtn.requestFocus();
     }
 
     private void changeMute() {
