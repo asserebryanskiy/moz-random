@@ -70,6 +70,8 @@ public class GeneratorController {
         video = new MediaPlayer(media);
         video.setMute(true);
         video.setCycleCount(MediaPlayer.INDEFINITE);
+
+        video.setAutoPlay(true);
         mediaView.setMediaPlayer(video);
         mediaView.setManaged(false);
 
@@ -125,10 +127,16 @@ public class GeneratorController {
             // scale to the size of the screen
             mediaView.setFitHeight(window.getHeight());
             double newFitWidth = media.getWidth() * ratio;
-            mediaView.setFitWidth(newFitWidth);
-
-            // center on X axis
-            mediaView.setLayoutX((window.getWidth() - newFitWidth) / 2);
+            // if video width is now smaller than window width, set its width to the window's width
+            if (newFitWidth < window.getWidth()) {
+                mediaView.setFitWidth(window.getWidth());
+                mediaView.setFitHeight(media.getHeight() * (window.getWidth() / media.getWidth()));
+                mediaView.setLayoutX(0);
+            } else {
+                mediaView.setFitWidth(newFitWidth);
+                // center on X axis
+                mediaView.setLayoutX((window.getWidth() - newFitWidth) / 2);
+            }
 
             // change size of the text
             double newFontSize = window.getHeight() * TEXT_HEIGHT_RATIO;
@@ -147,7 +155,7 @@ public class GeneratorController {
 
     private void stop() {
         run = false;
-        video.pause();
+        video.stop();
         audio.stop();
         animation.stop();
         startBtn.setText("Генерировать");
