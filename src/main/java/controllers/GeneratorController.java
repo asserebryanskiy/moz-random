@@ -61,7 +61,7 @@ public class GeneratorController {
         audioControls.setLayoutX(OFFSET_FROM_BORDER);
         volumeSlider.setMax(1);
         volumeSlider.setValue(1);
-        // to make available clicking space to start/stop playing
+        // to make available pressing space button to start/stop playing
         volumeSlider.setOnMouseReleased(e -> startBtn.requestFocus());
 
         // set up video
@@ -69,7 +69,10 @@ public class GeneratorController {
         media.heightProperty().addListener((observable, oldValue, newValue) -> correctVideoSize(media));
         video = new MediaPlayer(media);
         video.setMute(true);
-        video.setCycleCount(MediaPlayer.INDEFINITE);
+//        video.setCycleCount(MediaPlayer.INDEFINITE);
+        // because of strange bug in the production: after build with Zenjava plugin
+        // video is playing only one time and then stops without any errors
+        video.setOnEndOfMedia(() -> video.play());
 
         video.setAutoPlay(true);
         mediaView.setMediaPlayer(video);
