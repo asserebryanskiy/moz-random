@@ -24,6 +24,8 @@ import javafx.util.Duration;
 import model.RandomGenerator;
 
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class GeneratorController {
     private static final int TOP_PANEL_HEIGHT = 22;     // height of the OS panel with controls such as "close", "full-screen", etc.
@@ -32,7 +34,7 @@ public class GeneratorController {
     private static final String SOUND_SVG_PATH = "M5 17h-5v-10h5v10zm2-10v10l9 5v-20l-9 5zm17 4h-5v2h5v-2zm-1.584-6.232l-4.332 2.5 1 1.732 4.332-2.5-1-1.732zm1 12.732l-4.332-2.5-1 1.732 4.332 2.5 1-1.732z";
     private static final double TEXT_HEIGHT_RATIO = 75d/190d;  // ratio of text height relative to video height
     private static final String MUSIC_SRC = "/media/fort-boyard-monety.mp3";
-    private static final String VIDEO_SRC = "/media/video_moz.mp4";
+    private static final String VIDEO_SRC = "/media/moz.mp4";
 
     public StackPane root;
     public MediaView mediaView;
@@ -49,6 +51,9 @@ public class GeneratorController {
     private RandomGenerator generator;
     private boolean disallowRepeats;
     private MediaPlayer audio;
+    private Timer videoTimer;   // is needed because of strange behaviour of MediaPLayer cycleCount
+                                // look for details ir prepareVideo() method
+    private TimerTask task;     // is a field to make it available inside lambda expression..
 
     public void init(RandomGenerator generator, boolean disallowRepeats) {
 //        initLogo();
@@ -66,24 +71,13 @@ public class GeneratorController {
 
         // set up video
         Media media = new Media(getClass().getResource(VIDEO_SRC).toExternalForm());
-        media.heightProperty().addListener((observable, oldValue, newValue) -> correctVideoSize(media));
-        video = new MediaPlayer(media);
-        video.setMute(true);
-//        video.setCycleCount(MediaPlayer.INDEFINITE);
-        // because of strange bug in the production: after build with Zenjava plugin
-        // video is playing only one time and then stops without any errors
-        video.setOnEndOfMedia(() -> video.play());
-
-        video.setAutoPlay(true);
-        mediaView.setMediaPlayer(video);
-        mediaView.setManaged(false);
+        prepareVideo(media);
 
         // set up sound
         audio = new MediaPlayer(new Media(getClass().getResource(MUSIC_SRC).toExternalForm()));
         audio.setStartTime(Duration.millis(15000));
         audio.setCycleCount(MediaPlayer.INDEFINITE);
         audio.volumeProperty().bind(volumeSlider.valueProperty());
-
 
         // set up random number generation animation
         this.generator = generator;
@@ -99,6 +93,10 @@ public class GeneratorController {
         // bind root size to window size
         Platform.runLater(() -> {
             Stage stage = (Stage) root.getScene().getWindow();
+            stage.setOnCloseRequest(e -> {
+                // shut down videoTimer
+                shutDownTimer();
+            });
             root.maxWidthProperty().bind(stage.widthProperty());
             root.maxHeightProperty().bind(stage.heightProperty());
             stage.heightProperty().addListener((obs, n, o) -> correctVideoSize(media));
@@ -106,6 +104,46 @@ public class GeneratorController {
             play();
         });
 
+    }
+
+    private void prepareVideo(Media media) {
+        media.heightProperty().addListener((observable, oldValue, newValue) -> correctVideoSize(media));
+        prepareMediaPlayer(media);
+        mediaView.setMediaPlayer(video);
+        mediaView.setManaged(false);
+    }
+
+    private void prepareMediaPlayer(Media media) {
+        video = new MediaPlayer(media);
+        video.setMute(true);
+//        video.setCycleCount(MediaPlayer.INDEFINITE);
+        // because of strange bug in the production: after build with Zenjava plugin
+        // video is playing only one time and then stops without any errors
+        videoTimer = new Timer();
+        video.setOnPlaying(() -> {
+            double videoLength = media.getDuration().toMillis();
+            double currentTime = video.getCurrentTime().toMillis();
+            long delay = (long) (videoLength - currentTime);
+            task = new TimerTask() {
+                @Override
+                public void run() {
+                    // because for some reason after calling stop current
+                    // playing time remains at the end of the video
+                    video.seek(Duration.ZERO);
+                    video.stop();
+                }
+            };
+            videoTimer.schedule(task, delay);
+        });
+        video.setOnStopped(() -> video.play());
+        video.setOnPaused(() -> task.cancel());
+    }
+
+    private void shutDownTimer() {
+        if (videoTimer == null) return;
+        videoTimer.cancel();
+        videoTimer.purge();
+        videoTimer = null;
     }
 
     /*private void initLogo() {
@@ -123,7 +161,10 @@ public class GeneratorController {
     }*/
 
     private void correctVideoSize(Media media) {
-        Window window = root.getScene().getWindow();
+        if (root.getScene() == null) return;
+        Window window = root
+                .getScene()
+                .getWindow();
         if (window != null) {
             // if both video width and height are bigger we set height and then move video on X axis
             double ratio = window.getHeight() / media.getHeight();
@@ -158,7 +199,7 @@ public class GeneratorController {
 
     private void stop() {
         run = false;
-        video.stop();
+        video.pause();
         audio.stop();
         animation.stop();
         startBtn.setText("Генерировать");
