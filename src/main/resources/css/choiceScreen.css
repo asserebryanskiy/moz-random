@@ -34,3 +34,11 @@
 #btnNext:hover {
     -fx-fill: rgb(255,255,255, 0.5);
 }
+
+#sameNumberField {
+    -fx-font-size: 16;
+}
+
+#sameNumberLabel {
+    -fx-font-size: 16;
+}

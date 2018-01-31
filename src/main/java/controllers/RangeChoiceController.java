@@ -35,6 +35,8 @@ public class RangeChoiceController implements Initializable{
     public TextField minField;
     public TextField maxField;
     public VBox root;
+    public TextField sameNumberField;
+    public CheckBox disallowRepeatsCheckbox;
 
     private boolean disallowRepeats;    // if generated random numbers could repeat
     private Line minFieldLine;
@@ -68,12 +70,18 @@ public class RangeChoiceController implements Initializable{
             return;
         }
         GeneratorController controller = loader.getController();
+
+        // we need to change stage, because for some strange bug when we load on new stage video is not showed
+        // unless we resize the window
         Stage oldStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         Stage stage = new Stage();
         stage.getIcons().addAll(oldStage.getIcons());
         stage.setTitle(oldStage.getTitle());
         oldStage.close();
         controller.init(new RandomGenerator(min, max, disallowRepeats), disallowRepeats);
+        if (!sameNumberField.getText().isEmpty()) {
+            controller.setSameNumber(sameNumberField.getText());
+        }
         stage.setScene(new Scene(root, 800, 600));
         stage.show();
         stage.setResizable(true);
@@ -88,10 +96,17 @@ public class RangeChoiceController implements Initializable{
     public void initialize(URL location, ResourceBundle resources) {
         double rootWidth = 400;
         double rootHeight = 332;
-        System.out.println(rootHeight);
 
         setUpField(minField);
         setUpField(maxField);
+        setDigitVerification(sameNumberField);
+
+        sameNumberField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.isEmpty() && newValue.matches("\\d*")) {
+                disallowRepeatsCheckbox.setSelected(false);
+                disallowRepeatsCheckbox.setDisable(true);
+            } else disallowRepeatsCheckbox.setDisable(false);
+        });
 
         double lineWidth = 100;
         double y = 150;
@@ -122,11 +137,7 @@ public class RangeChoiceController implements Initializable{
     }
 
     private void setUpField(final TextField textField) {
-        textField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches("\\d*")) {
-                textField.setText(newValue.replaceAll("[^\\d]", ""));
-            }
-        });
+        setDigitVerification(textField);
         textField.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
                 String id = textField.getId();
@@ -138,6 +149,15 @@ public class RangeChoiceController implements Initializable{
                     if (id.startsWith("min")) scale(minFieldLine, 0, 1);
                     else                      scale(maxFieldLine, 0, 1);
                 }
+            }
+        });
+    }
+
+    // checks if input is only digits
+    private void setDigitVerification(TextField textField) {
+        textField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                textField.setText(newValue.replaceAll("[^\\d]", ""));
             }
         });
     }
