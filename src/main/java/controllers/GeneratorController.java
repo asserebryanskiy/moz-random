@@ -24,8 +24,6 @@ import javafx.util.Duration;
 import model.RandomGenerator;
 
 import java.io.IOException;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class GeneratorController {
     private static final int TOP_PANEL_HEIGHT = 22;     // height of the OS panel with controls such as "close", "full-screen", etc.
@@ -35,6 +33,7 @@ public class GeneratorController {
     private static final double TEXT_HEIGHT_RATIO = 75d/190d;  // ratio of text height relative to video height
     private static final String MUSIC_SRC = "/media/fort-boyard-monety.mp3";
     private static final String VIDEO_SRC = "/media/moz.mp4";
+    private static final String ABSENT_VALUE = "no_value"; // if we no value for alwaysSameNumber was specified
 
     public StackPane root;
     public MediaView mediaView;
@@ -44,16 +43,18 @@ public class GeneratorController {
     public SVGPath muteSvg;
     public HBox audioControls;
 
-    public Slider volumeSlider;
-    private MediaPlayer video;
-    private boolean run;
-    private Timeline animation;
-    private RandomGenerator generator;
-    private boolean disallowRepeats;
-    private MediaPlayer audio;
-    private Timer videoTimer;   // is needed because of strange behaviour of MediaPLayer cycleCount
+    public Slider volumeSlider;         // regulates music volume
+    private MediaPlayer video;          // media player, when video is shown (completely bugged!)
+    private Media media;                // media with video
+    private boolean run;                // if an application now is in a run phase? (video is playing, generator is working)
+    private Timeline animation;         // animation of random numbers change
+    private RandomGenerator generator;  // generated random numbers
+    private boolean disallowRepeats;    // if generator is not allowed to generate the same value twice
+    private MediaPlayer audio;          // mediaplayer for background sound
+//    private Timer videoTimer;   // is needed because of strange behaviour of MediaPLayer cycleCount
                                 // look for details ir prepareVideo() method
-    private TimerTask task;     // is a field to make it available inside lambda expression..
+    private String alwaysSameNumber = ABSENT_VALUE; // optionable field that is set by the user
+                                                    // to make generator always return the same value
 
     public void init(RandomGenerator generator, boolean disallowRepeats) {
 //        initLogo();
@@ -65,19 +66,20 @@ public class GeneratorController {
                 .subtract(OFFSET_FROM_BORDER + height + TOP_PANEL_HEIGHT));
         audioControls.setLayoutX(OFFSET_FROM_BORDER);
         volumeSlider.setMax(1);
-        volumeSlider.setValue(1);
+        volumeSlider.setValue(0);
         // to make available pressing space button to start/stop playing
         volumeSlider.setOnMouseReleased(e -> startBtn.requestFocus());
 
         // set up video
-        Media media = new Media(getClass().getResource(VIDEO_SRC).toExternalForm());
-        prepareVideo(media);
+        media = new Media(getClass().getResource(VIDEO_SRC).toExternalForm());
+        prepareVideo();
 
         // set up sound
         audio = new MediaPlayer(new Media(getClass().getResource(MUSIC_SRC).toExternalForm()));
         audio.setStartTime(Duration.millis(15000));
         audio.setCycleCount(MediaPlayer.INDEFINITE);
         audio.volumeProperty().bind(volumeSlider.valueProperty());
+        changeMute();   // sets default volume property to mute
 
         // set up random number generation animation
         this.generator = generator;
@@ -93,10 +95,10 @@ public class GeneratorController {
         // bind root size to window size
         Platform.runLater(() -> {
             Stage stage = (Stage) root.getScene().getWindow();
-            stage.setOnCloseRequest(e -> {
+            /*stage.setOnCloseRequest(e -> {
                 // shut down videoTimer
                 shutDownTimer();
-            });
+            });*/
             root.maxWidthProperty().bind(stage.widthProperty());
             root.maxHeightProperty().bind(stage.heightProperty());
             stage.heightProperty().addListener((obs, n, o) -> correctVideoSize(media));
@@ -106,65 +108,22 @@ public class GeneratorController {
 
     }
 
-    private void prepareVideo(Media media) {
+    private void prepareVideo() {
         media.heightProperty().addListener((observable, oldValue, newValue) -> correctVideoSize(media));
-        prepareMediaPlayer(media);
-        mediaView.setMediaPlayer(video);
+        prepareMediaPlayer();
         mediaView.setManaged(false);
     }
 
-    private void prepareMediaPlayer(Media media) {
+    private void prepareMediaPlayer() {
         video = new MediaPlayer(media);
         video.setMute(true);
-//        video.setCycleCount(MediaPlayer.INDEFINITE);
-        // because of strange bug in the production: after build with Zenjava plugin
-        // video is playing only one time and then stops without any errors
-        videoTimer = new Timer();
-        video.setOnPlaying(() -> {
-            double videoLength = media.getDuration().toMillis();
-            double currentTime = video.getCurrentTime().toMillis();
-            long delay = (long) (videoLength - currentTime);
-            task = new TimerTask() {
-                @Override
-                public void run() {
-                    // because for some reason after calling stop current
-                    // playing time remains at the end of the video
-                    video.seek(Duration.ZERO);
-                    video.stop();
-                }
-            };
-            videoTimer.schedule(task, delay);
-        });
-        video.setOnStopped(() -> video.play());
-        video.setOnPaused(() -> task.cancel());
+        video.setCycleCount(MediaPlayer.INDEFINITE);
+        video.setAutoPlay(true);
+        mediaView.setMediaPlayer(video);
     }
-
-    private void shutDownTimer() {
-        if (videoTimer == null) return;
-        videoTimer.cancel();
-        videoTimer.purge();
-        videoTimer = null;
-    }
-
-    /*private void initLogo() {
-        Image image = new Image(getClass().getResource("/media/logo.png").toString());
-        ImageView imageView = new ImageView(image);
-        imageView.setManaged(false);
-        imageView.setPreserveRatio(true);
-        root.maxWidthProperty().addListener((observable, oldValue, newValue) -> {
-            double newFitWidth = newValue.doubleValue() * 0.3;
-            imageView.setFitWidth(newFitWidth);
-            imageView.setLayoutX((newValue.doubleValue() - newFitWidth) / 2);
-        });
-        imageView.setLayoutY(OFFSET_FROM_BORDER);
-        root.getChildren().add(imageView);
-    }*/
 
     private void correctVideoSize(Media media) {
-        if (root.getScene() == null) return;
-        Window window = root
-                .getScene()
-                .getWindow();
+        Window window = root.getScene().getWindow();
         if (window != null) {
             // if both video width and height are bigger we set height and then move video on X axis
             double ratio = window.getHeight() / media.getHeight();
@@ -191,6 +150,7 @@ public class GeneratorController {
 
     private void play() {
         run = true;
+        video.seek(Duration.ZERO);
         video.play();
         audio.play();
         animation.play();
@@ -204,7 +164,9 @@ public class GeneratorController {
         animation.stop();
         startBtn.setText("Генерировать");
 
-        if (disallowRepeats) number.setText(String.valueOf(generator.generateWithoutRepeats()));
+        if      (!alwaysSameNumber.equals(ABSENT_VALUE)) number.setText(alwaysSameNumber);
+        else if (disallowRepeats)
+            number.setText(String.valueOf(generator.generateWithoutRepeats()));
     }
 
     public void handleGenerate() {
@@ -232,7 +194,6 @@ public class GeneratorController {
         if (keyEvent.getCharacter().equals("m") || keyEvent.getCharacter().equals("ь")) {
             changeMute();
         }
-//        else if (keyEvent.getCharacter().equals(" ")) handleGenerate();
     }
 
     public void handleMuteFromBtn() {
@@ -249,4 +210,29 @@ public class GeneratorController {
             muteSvg.setContent(SOUND_SVG_PATH);
         }
     }
+
+    void setSameNumber(String sameNumber) {
+        this.alwaysSameNumber = sameNumber;
+    }
+
+    /*private void shutDownTimer() {
+        if (videoTimer == null) return;
+        videoTimer.cancel();
+        videoTimer.purge();
+        videoTimer = null;
+    }*/
+
+    /*private void initLogo() {
+        Image image = new Image(getClass().getResource("/media/logo.png").toString());
+        ImageView imageView = new ImageView(image);
+        imageView.setManaged(false);
+        imageView.setPreserveRatio(true);
+        root.maxWidthProperty().addListener((observable, oldValue, newValue) -> {
+            double newFitWidth = newValue.doubleValue() * 0.3;
+            imageView.setFitWidth(newFitWidth);
+            imageView.setLayoutX((newValue.doubleValue() - newFitWidth) / 2);
+        });
+        imageView.setLayoutY(OFFSET_FROM_BORDER);
+        root.getChildren().add(imageView);
+    }*/
 }
