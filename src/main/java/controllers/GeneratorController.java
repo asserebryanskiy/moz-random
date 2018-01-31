@@ -211,7 +211,7 @@ public class GeneratorController {
         }
     }
 
-    void setSameNumber(String sameNumber) {
+    public void setSameNumber(String sameNumber) {
         this.alwaysSameNumber = sameNumber;
     }
 
