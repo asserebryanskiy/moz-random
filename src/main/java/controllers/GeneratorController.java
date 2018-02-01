@@ -34,6 +34,7 @@ public class GeneratorController {
     private static final String MUSIC_SRC = "/media/fort-boyard-monety.mp3";
     private static final String VIDEO_SRC = "/media/moz.mp4";
     private static final String ABSENT_VALUE = "no_value"; // if we no value for alwaysSameNumber was specified
+    private static final int NUMBER_CHANGE_FREQ = 100;   // duration in millis after which random number changes
 
     public StackPane root;
     public MediaView mediaView;
@@ -85,9 +86,8 @@ public class GeneratorController {
         this.generator = generator;
         this.disallowRepeats = disallowRepeats;
         animation = new Timeline();
-        animation.setAutoReverse(true);
         animation.setCycleCount(Integer.MAX_VALUE);
-        animation.getKeyFrames().add(new KeyFrame(Duration.millis(50), e ->
+        animation.getKeyFrames().add(new KeyFrame(Duration.millis(NUMBER_CHANGE_FREQ), e ->
                 number.setText(String.valueOf(generator.generate()))));
 
         number.setText(String.valueOf(generator.getMin()));
@@ -159,14 +159,17 @@ public class GeneratorController {
 
     private void stop() {
         run = false;
+        if      (!alwaysSameNumber.equals(ABSENT_VALUE)) {
+            number.setText(alwaysSameNumber);
+        }
+        else if (disallowRepeats)
+            number.setText(String.valueOf(generator.generateWithoutRepeats()));
+        number.layout();
+
         video.pause();
         audio.stop();
         animation.stop();
         startBtn.setText("Генерировать");
-
-        if      (!alwaysSameNumber.equals(ABSENT_VALUE)) number.setText(alwaysSameNumber);
-        else if (disallowRepeats)
-            number.setText(String.valueOf(generator.generateWithoutRepeats()));
     }
 
     public void handleGenerate() {
