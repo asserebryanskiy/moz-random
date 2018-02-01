@@ -12,6 +12,8 @@ import javafx.stage.Stage;
 public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         Font.loadFont(getClass().getResourceAsStream("/fonts/CRC35.OTF"), 13);
+        Font font = Font.loadFont(getClass().getResourceAsStream("/fonts/CIRCE-EXTRABOLD.OTF"), 13);
+        System.out.println(font.getName());
         Parent root = FXMLLoader.load(getClass().getResource("/fxml/RangeChoice.fxml"));
         primaryStage.setScene(new Scene(root));
         primaryStage.getIcons().add(new Image(getClass()
