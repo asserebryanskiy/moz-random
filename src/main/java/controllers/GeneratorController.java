@@ -71,7 +71,7 @@ public class GeneratorController {
                 .subtract(OFFSET_FROM_BORDER + height + TOP_PANEL_HEIGHT));
         audioControls.setLayoutX(OFFSET_FROM_BORDER);
         volumeSlider.setMax(1);
-        volumeSlider.setValue(0);
+        volumeSlider.setValue(1);
         // to make available pressing space button to start/stop playing
         volumeSlider.setOnMouseReleased(e -> startBtn.requestFocus());
 
@@ -93,24 +93,14 @@ public class GeneratorController {
         animation.setCycleCount(Integer.MAX_VALUE);
         animation.getKeyFrames().add(new KeyFrame(Duration.millis(NUMBER_CHANGE_FREQ), e ->
                 number.setText(String.valueOf(generator.generate()))));
-        number.textProperty().addListener((observable, oldValue, newValue) -> {
-            System.out.println("Text changed to " + newValue + " on " + LocalDateTime.now());
-        });
-        animation.statusProperty().addListener((observable, oldValue, newValue) -> {
-            System.out.println("animation status changed to " + newValue + " on " + LocalDateTime.now());
-        });
         root.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
-            System.out.println("Entered in scene event filter" + LocalDateTime.now());
-            long delay = (long) animation.getCycleDuration().subtract(animation.getCurrentTime()).toMillis();
-            try {
-                sleep(delay + 10);
-            } catch (InterruptedException e1) {
-                e1.printStackTrace();
+            // this is done here to address strange bug with delay of number change
+            // to desired value (e.g, if alwaysSameNumber is turned on)
+            if (e.getCode().equals(KeyCode.SPACE) && run) {
+                substituteNumberIfNeeded();
             }
-            System.out.println(delay);
-            animation.stop();
-            number.setText(alwaysSameNumber);
         });
+        startBtn.addEventFilter(MouseEvent.MOUSE_PRESSED, e -> substituteNumberIfNeeded());
 
         number.setText(String.valueOf(generator.getMin()));
 
@@ -128,6 +118,23 @@ public class GeneratorController {
             play();
         });
 
+    }
+
+    private void substituteNumberIfNeeded() {
+        if (run) {
+            long delay = (long) animation.getCycleDuration().subtract(animation.getCurrentTime()).toMillis();
+            try {
+                sleep(delay + 10);
+            } catch (InterruptedException e1) {
+                e1.printStackTrace();
+            }
+            animation.stop();
+            if      (!alwaysSameNumber.equals(ABSENT_VALUE)) {
+                number.setText(alwaysSameNumber);
+            }
+            else if (disallowRepeats)
+                number.setText(String.valueOf(generator.generateWithoutRepeats()));
+        }
     }
 
     private void prepareVideo() {
@@ -181,17 +188,13 @@ public class GeneratorController {
 
     private void stop() {
         run = false;
-        /*if      (!alwaysSameNumber.equals(ABSENT_VALUE)) {
-            number.setText(alwaysSameNumber);
-        }
-        else if (disallowRepeats)
-            number.setText(String.valueOf(generator.generateWithoutRepeats()));
-        number.layout();*/
-
         video.pause();
         audio.stop();
+        // animation is stopped in the scene event filter, because of strange bug
+        // with delay of number change to alwaysSameNumber. Change of number text
+        // is also moved to scene event filter. Scene event filter is set in the
+        // initialize() method.
 //        animation.stop();
-        System.out.println("Stopped animation on " + LocalDateTime.now());
         startBtn.setText("Генерировать");
     }
 
@@ -221,7 +224,6 @@ public class GeneratorController {
         if (keyEvent.getCharacter().equals("m") || keyEvent.getCharacter().equals("ь")) {
             changeMute();
         }
-        System.out.println("Key was pressed on " + LocalDateTime.now());
     }
 
     public void handleMuteFromBtn() {
