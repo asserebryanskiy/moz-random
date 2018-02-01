@@ -10,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -24,6 +25,9 @@ import javafx.util.Duration;
 import model.RandomGenerator;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+
+import static java.lang.Thread.sleep;
 
 public class GeneratorController {
     private static final int TOP_PANEL_HEIGHT = 22;     // height of the OS panel with controls such as "close", "full-screen", etc.
@@ -89,6 +93,24 @@ public class GeneratorController {
         animation.setCycleCount(Integer.MAX_VALUE);
         animation.getKeyFrames().add(new KeyFrame(Duration.millis(NUMBER_CHANGE_FREQ), e ->
                 number.setText(String.valueOf(generator.generate()))));
+        number.textProperty().addListener((observable, oldValue, newValue) -> {
+            System.out.println("Text changed to " + newValue + " on " + LocalDateTime.now());
+        });
+        animation.statusProperty().addListener((observable, oldValue, newValue) -> {
+            System.out.println("animation status changed to " + newValue + " on " + LocalDateTime.now());
+        });
+        root.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
+            System.out.println("Entered in scene event filter" + LocalDateTime.now());
+            long delay = (long) animation.getCycleDuration().subtract(animation.getCurrentTime()).toMillis();
+            try {
+                sleep(delay + 10);
+            } catch (InterruptedException e1) {
+                e1.printStackTrace();
+            }
+            System.out.println(delay);
+            animation.stop();
+            number.setText(alwaysSameNumber);
+        });
 
         number.setText(String.valueOf(generator.getMin()));
 
@@ -159,16 +181,17 @@ public class GeneratorController {
 
     private void stop() {
         run = false;
-        if      (!alwaysSameNumber.equals(ABSENT_VALUE)) {
+        /*if      (!alwaysSameNumber.equals(ABSENT_VALUE)) {
             number.setText(alwaysSameNumber);
         }
         else if (disallowRepeats)
             number.setText(String.valueOf(generator.generateWithoutRepeats()));
-        number.layout();
+        number.layout();*/
 
         video.pause();
         audio.stop();
-        animation.stop();
+//        animation.stop();
+        System.out.println("Stopped animation on " + LocalDateTime.now());
         startBtn.setText("Генерировать");
     }
 
@@ -198,6 +221,7 @@ public class GeneratorController {
         if (keyEvent.getCharacter().equals("m") || keyEvent.getCharacter().equals("ь")) {
             changeMute();
         }
+        System.out.println("Key was pressed on " + LocalDateTime.now());
     }
 
     public void handleMuteFromBtn() {
