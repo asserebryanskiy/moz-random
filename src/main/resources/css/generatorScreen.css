@@ -8,6 +8,17 @@
     -fx-text-fill: white;
 }
 
+.svgPane {
+    -fx-max-width: 24;
+    -fx-max-height: 24;
+    -fx-scaleX: 0.5;
+    -fx-scaleY: 0.5;
+}
+
+.svg {
+    -fx-fill: gray-color-transparent;
+}
+
 .button {
     -fx-background-color: transparent;
     -fx-text-fill: gray-color-transparent;
