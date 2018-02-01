@@ -179,6 +179,7 @@ public class GeneratorController {
 
     public void handleBack(MouseEvent mouseEvent) {
         if (run) stop();
+        alwaysSameNumber = ABSENT_VALUE;
         Parent root;
         try {
             root = FXMLLoader.load(getClass().getResource("/fxml/RangeChoice.fxml"));
