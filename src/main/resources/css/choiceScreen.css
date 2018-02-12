@@ -1,7 +1,8 @@
 * {
+    standard-background-color: rgb(78,53,73);
     -fx-font-family: "Circe Light";
     -fx-text-fill: white;
-    -fx-background-color: rgb(78,53,73);
+    -fx-background-color: standard-background-color;
 }
 
 .label {
@@ -26,19 +27,33 @@
     -fx-background-color: white;
 }
 
+.radio-button > .radio,
+.radio-button > .radio > .dot {
+    -fx-background-color: white;
+}
+
+.radio-button > .label,
+#asnStrategyLabel {
+    -fx-font-size: 14;
+}
+
+.radio-button:selected > .radio > .dot {
+    -fx-background-insets: 0;
+    -fx-background-color: standard-background-color;
+}
+
 #btnNext {
     -fx-fill: rgb(255,255,255);
     -fx-cursor: hand;
 }
 
 #btnNext:hover {
-    -fx-fill: rgb(255,255,255, 0.5);
+    -fx-fill: rgba(255,255,255, 0.5);
 }
 
-#sameNumberField {
-    -fx-font-size: 16;
-}
-
+#sameNumberField,
 #sameNumberLabel {
     -fx-font-size: 16;
 }
+
+

@@ -23,10 +23,13 @@ import javafx.scene.shape.SVGPath;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Duration;
+import model.AsnStrategy;
 import model.RandomGenerator;
+import util.Util;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.lang.Thread.sleep;
 
@@ -40,7 +43,7 @@ public class GeneratorController {
     private static final double TEXT_HEIGHT_RATIO = 75d/190d;  // ratio of text height relative to video height
     private static final String MUSIC_SRC = "/media/fort-boyard-monety.mp3";
     private static final String VIDEO_SRC = "/media/moz.mp4";
-    private static final String ABSENT_VALUE = "no_value"; // if we no value for alwaysSameNumber was specified
+    private static final String ABSENT_VALUE = "no_value"; // if we no value for alwaysSameNumbers was specified
     private static final int NUMBER_CHANGE_FREQ = 100;   // duration in millis after which random number changes
 
     public StackPane root;
@@ -61,10 +64,14 @@ public class GeneratorController {
     private RandomGenerator generator;  // generated random numbers
     private boolean disallowRepeats;    // if generator is not allowed to generate the same value twice
     private MediaPlayer audio;          // mediaplayer for background sound
-//    private Timer videoTimer;   // is needed because of strange behaviour of MediaPLayer cycleCount
-                                // look for details ir prepareVideo() method
-    private String alwaysSameNumber = ABSENT_VALUE; // optionable field that is set by the user
+    private List<String> alwaysSameNumbers = null;  // optional field that is set by the user
                                                     // to make generator always return the same value
+    private AsnStrategy asnStrategy;
+    private int pointer;    // points to the next index in alwaysSameNumbers list that should be used
+    // when asnStrategy is SUBSEQUENT
+    private List<String> usedNumbers = new ArrayList<>();   // saves used numbers to disallow repeats
+    // when using alwaysSameNumbers with generation strategy RANDOM
+
 
     public void init(RandomGenerator generator, boolean disallowRepeats) {
 //        initLogo();
@@ -97,7 +104,7 @@ public class GeneratorController {
                 number.setText(String.valueOf(generator.generate()))));
         root.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
             // this is done here to address strange bug with delay of number change
-            // to desired value (e.g, if alwaysSameNumber is turned on)
+            // to desired value (e.g, if alwaysSameNumbers is turned on)
             if (e.getCode().equals(KeyCode.SPACE) && run) {
                 substituteNumberIfNeeded();
             }
@@ -145,12 +152,30 @@ public class GeneratorController {
                 e1.printStackTrace();
             }
             animation.stop();
-            if      (!alwaysSameNumber.equals(ABSENT_VALUE)) {
-                number.setText(alwaysSameNumber);
+            if (alwaysSameNumbers != null) {
+                number.setText(getNextFromAsn());
             }
             else if (disallowRepeats)
                 number.setText(String.valueOf(generator.generateWithoutRepeats()));
         }
+    }
+
+    // returns next number from the range of Always Same Numbers according to the asnStrategy
+    private String getNextFromAsn() {
+        if (asnStrategy != null) {
+            if (asnStrategy == AsnStrategy.SUBSEQUENT) {
+                return alwaysSameNumbers.get(pointer++ % alwaysSameNumbers.size());
+            } else {
+                if (usedNumbers.size() == alwaysSameNumbers.size()) usedNumbers.clear();
+                String next = alwaysSameNumbers.get(Math.round((float) Math.random() * (alwaysSameNumbers.size() - 1)));
+                while (usedNumbers.contains(next)) {
+                    next = alwaysSameNumbers.get(Math.round((float) Math.random() * (alwaysSameNumbers.size() - 1)));
+                }
+                usedNumbers.add(next);
+                return next;
+            }
+        }
+        return alwaysSameNumbers.get(0);
     }
 
     private void prepareVideo() {
@@ -209,7 +234,7 @@ public class GeneratorController {
         video.pause();
         audio.stop();
         // animation is stopped in the scene event filter, because of strange bug
-        // with delay of number change to alwaysSameNumber. Change of number text
+        // with delay of number change to alwaysSameNumbers. Change of number text
         // is also moved to scene event filter. Scene event filter is set in the
         // initialize() method.
 //        animation.stop();
@@ -223,7 +248,7 @@ public class GeneratorController {
 
     public void handleBack(MouseEvent mouseEvent) {
         if (run) stop();
-        alwaysSameNumber = ABSENT_VALUE;
+        alwaysSameNumbers = null;
         Parent root;
         try {
             root = FXMLLoader.load(getClass().getResource("/fxml/RangeChoice.fxml"));
@@ -259,8 +284,8 @@ public class GeneratorController {
         }
     }
 
-    public void setSameNumber(String sameNumber) {
-        this.alwaysSameNumber = sameNumber;
+    public void setSameNumbers(String sameNumbers) {
+        this.alwaysSameNumbers = Util.getNumbersFromAsnString(sameNumbers);
     }
 
     public void changeSvgColor(MouseEvent event) {
@@ -281,6 +306,10 @@ public class GeneratorController {
             fullScreenSvg.setContent(UNSCALE_SVG_PATH);
             stage.setFullScreen(true);
         }
+    }
+
+    public void setAsnStrategy(AsnStrategy asnStrategy) {
+        this.asnStrategy = asnStrategy;
     }
 
     /*private void shutDownTimer() {

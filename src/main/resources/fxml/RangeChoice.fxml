@@ -8,7 +8,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox fx:id="root" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#handleProceed" prefWidth="400.0" spacing="5.0" stylesheets="@../css/choiceScreen.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.RangeChoiceController">
+<VBox fx:id="root" alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#handleProceed" prefWidth="400.0" spacing="5.0" stylesheets="@../css/choiceScreen.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.RangeChoiceController">
    <children>
       <Label text="Сгенерировать случайные числа с " />
       <TextField fx:id="minField" alignment="CENTER" prefWidth="50.0" />
@@ -17,8 +17,8 @@
       <CheckBox fx:id="disallowRepeatsCheckbox" mnemonicParsing="false" onAction="#handleChangeAllowRepeats" text="Не допускать повторы" />
       <HBox alignment="CENTER">
          <children>
-            <Label fx:id="sameNumberLabel" text="Всегда показывать число" />
-            <TextField fx:id="sameNumberField" prefHeight="32.0" prefWidth="32.0" style="-fx-border-color: white; -fx-border-width: 0 0 1 0;" />
+            <Label fx:id="sameNumberLabel" text="Всегда показывать числа" />
+            <TextField fx:id="sameNumberField" alignment="CENTER" prefHeight="32.0" prefWidth="40.0" style="-fx-border-color: white; -fx-border-width: 0 0 1 0;" />
          </children>
       </HBox>
    </children>

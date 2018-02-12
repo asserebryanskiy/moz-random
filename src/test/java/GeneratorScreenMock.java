@@ -18,7 +18,7 @@ public class GeneratorScreenMock extends Application {
         Parent root = loader.load();
         GeneratorController controller = loader.getController();
         controller.init(new RandomGenerator(0, 100, false), false);
-        controller.setSameNumber("2");
+        controller.setSameNumbers("2");
         primaryStage.setScene(new Scene(root, 800, 600));
         primaryStage.setTitle("МОЗ Генератор случайных чисел");
         primaryStage.show();
