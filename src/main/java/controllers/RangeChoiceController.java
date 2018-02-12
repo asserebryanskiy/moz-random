@@ -38,8 +38,8 @@ import java.util.TimerTask;
  */
 public class RangeChoiceController implements Initializable {
 
-    public static final int ROOT_WIDTH = 400;
-    public static final int ROOT_HEIGHT = 332;
+    private static final int ROOT_WIDTH = 400;
+    private static final int ROOT_HEIGHT = 332;
     public TextField minField;
     public TextField maxField;
     public VBox root;
@@ -219,7 +219,6 @@ public class RangeChoiceController implements Initializable {
                     window.setHeight(previousHeight + heightChange);
                     clip.setHeight(clip.getHeight() - shift);
                 } else {
-                    System.out.println(window.getHeight() - previousHeight);
                     asnAnimationRunning = false;
                     if (show) {
                         clip.setVisible(false);
