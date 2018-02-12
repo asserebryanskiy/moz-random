@@ -33,8 +33,6 @@ import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static java.lang.Thread.sleep;
-
 /**
  * Created by andreyserebryanskiy on 10/01/2018.
  */
@@ -208,32 +206,35 @@ public class RangeChoiceController implements Initializable {
         double shift = heightIncrease / (duration / period);
         Timer timer = new Timer();
         Window window = root.getScene().getWindow();
-        double originalHeight = window.getHeight();
         Rectangle clip = (Rectangle) asnStrategyBox.getChildren().get(1);
         if (!show) clip.setVisible(true);
         asnAnimationRunning = true;
-        timer.schedule(new TimerTask() {
+        double previousHeight = window.getHeight();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            double heightChange = 0;
+
             @Override
             public void run() {
-                window.setHeight(window.getHeight() + shift);
-                clip.setHeight(clip.getHeight() - shift);
+                if ((show && heightChange < heightIncrease) || (!show && heightChange > heightIncrease)) {
+                    window.setHeight(previousHeight + heightChange);
+                    clip.setHeight(clip.getHeight() - shift);
+                } else {
+                    System.out.println(window.getHeight() - previousHeight);
+                    asnAnimationRunning = false;
+                    if (show) {
+                        clip.setVisible(false);
+                    } else {
+                        Platform.runLater(() -> {
+                            asnStrategyBox.setVisible(false);
+                            root.getChildren().remove(asnStrategyBox);
+                        });
+                    }
+                    timer.cancel();
+                }
+                heightChange += shift;
             }
         }, 0, period);
-        window.heightProperty().addListener((observable, oldValue, newValue) -> {
-            if (show && newValue.doubleValue() > originalHeight + heightIncrease) {
-                timer.cancel();
-                asnAnimationRunning = false;
-                clip.setVisible(false);
-            }
-            if (!show && newValue.doubleValue() < originalHeight + heightIncrease) {
-                timer.cancel();
-                asnAnimationRunning = false;
-                Platform.runLater(() -> {
-                    asnStrategyBox.setVisible(false);
-                    root.getChildren().remove(asnStrategyBox);
-                });
-            }
-        });
+
     }
 
 
