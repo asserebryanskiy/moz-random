@@ -1,12 +1,13 @@
 * {
-    -fx-font-family: "Circe Light";
-    gray-color-transparent: rgb(124,121,121, 0.5);
+    gray-color-transparent: rgba(124,121,121, 0.5);
     gray-color: rgb(124,121,121);
 }
 
 #number {
     -fx-text-fill: white;
     -fx-font-family: "Circe Extra Bold";
+    -fx-border-color: red;
+    -fx-border-width: 2px;
 }
 
 .svgPane {
@@ -21,6 +22,7 @@
 }
 
 .button {
+    -fx-font-family: "Circe Light";
     -fx-background-color: transparent;
     -fx-text-fill: gray-color-transparent;
     -fx-cursor: hand;
@@ -31,6 +33,7 @@
 }
 
 .btn {
+    -fx-font-family: "Circe Light";
     -fx-fill: gray-color-transparent;
     -fx-cursor: hand;
 }

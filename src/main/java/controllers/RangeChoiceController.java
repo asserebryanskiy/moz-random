@@ -14,6 +14,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -25,6 +26,7 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Duration;
 import model.AsnStrategy;
+import model.HelpPopUp;
 import model.RandomGenerator;
 
 import java.io.IOException;
@@ -49,6 +51,7 @@ public class RangeChoiceController implements Initializable {
     private boolean disallowRepeats;    // if generated random numbers could repeat
     private Line minFieldLine;
     private Line maxFieldLine;
+    private HelpPopUp helpPopUp;
 
     private static Pane asnStrategyBox = createAsnStrategyBox();
     // indicates if now showing/hiding animation of asnStrategyBox is running
@@ -107,6 +110,7 @@ public class RangeChoiceController implements Initializable {
                         .getText().equals("Последовательно") ?
                         AsnStrategy.SUBSEQUENT : AsnStrategy.RANDOM;
                 controller.setAsnStrategy(asnStrategy);
+                asnStrategyBox.setVisible(false);
             }
         }
         stage.setScene(new Scene(root, 800, 600));
@@ -125,7 +129,7 @@ public class RangeChoiceController implements Initializable {
         setUpField(maxField);
 
         double oneLetterWidth = Toolkit.getToolkit().getFontLoader()
-                .computeStringWidth("5", sameNumberField.getFont()) + 2;
+                .computeStringWidth("5", sameNumberField.getFont()) + 5;
         sameNumberField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("^(\\d+|\\d+-\\d+)(,?(\\d+|\\d+-\\d+))*$")) {
                 sameNumberField.setText(newValue.replaceAll("[а-яА-Яa-zA-Z]", ""));
@@ -135,7 +139,7 @@ public class RangeChoiceController implements Initializable {
                 disallowRepeatsCheckbox.setSelected(false);
                 disallowRepeatsCheckbox.setDisable(true);
             } else disallowRepeatsCheckbox.setDisable(false);
-            sameNumberField.setPrefWidth(Math.max(40, text.length() * oneLetterWidth + 10));
+            sameNumberField.setPrefWidth(Math.max(50, text.length() * oneLetterWidth + 10));
             if ((text.contains(",") || text.contains("-"))) {
                 if (!asnStrategyBox.isVisible() && !asnAnimationRunning) {
                     showAsnStrategyBox(true);
@@ -268,5 +272,11 @@ public class RangeChoiceController implements Initializable {
         ScaleTransition transition = new ScaleTransition(Duration.millis(500), line);
         transition.setByX(line.getScaleX() != 0 ? newV : defaultV);
         transition.play();
+    }
+
+    public void handleShowHelpBox(MouseEvent event) {
+        if(helpPopUp != null && helpPopUp.isShowing()) return;
+        helpPopUp = new HelpPopUp("Введите нужные числа через запятую или введите интервал через \"-\". Например, \"1\" или \"1,2\", или \"1-5\", или \"1,3,9-15\".\n");
+        helpPopUp.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
     }
 }

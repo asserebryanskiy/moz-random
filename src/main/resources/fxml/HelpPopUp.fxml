@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.shape.SVGPath?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+<StackPane alignment="TOP_LEFT" prefHeight="75.0" prefWidth="220.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.HelpPopUpController">
+   <children>
+      <Rectangle fx:id="background" arcHeight="10.0" arcWidth="10.0" fill="#000000c5" height="75.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="238.0" />
+      <HBox fx:id="contentRoot">
+         <children>
+            <Text fx:id="content" fill="#fff9f9" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" textOrigin="TOP" wrappingWidth="207.0">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+               <font>
+                  <Font size="11.0" />
+               </font>
+            </Text>
+            <Pane maxHeight="12.0" maxWidth="12.0" onMouseClicked="#handleClosePopUp" onMouseEntered="#handleChangeColor" onMouseExited="#handleResetColor">
+               <children>
+                  <SVGPath content="M24 20.188l-8.315-8.209 8.2-8.282-3.697-3.697-8.212 8.318-8.31-8.203-3.666 3.666 8.321 8.24-8.206 8.313 3.666 3.666 8.237-8.318 8.285 8.203z" fill="#eeeeee" scaleX="0.5" scaleY="0.5" translateX="-6.0" translateY="-6.0" />
+               </children>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Pane>
+         </children>
+         <StackPane.margin>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </StackPane.margin>
+      </HBox>
+   </children>
+</StackPane>

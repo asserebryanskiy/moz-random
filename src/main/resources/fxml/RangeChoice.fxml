@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.text.*?>
-<?import javafx.geometry.*?>
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.SVGPath?>
 <VBox fx:id="root" alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#handleProceed" prefWidth="400.0" spacing="5.0" stylesheets="@../css/choiceScreen.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.RangeChoiceController">
    <children>
       <Label text="Сгенерировать случайные числа с " />
@@ -15,10 +14,18 @@
       <Label text="по" />
       <TextField fx:id="maxField" alignment="CENTER" prefWidth="50.0" />
       <CheckBox fx:id="disallowRepeatsCheckbox" mnemonicParsing="false" onAction="#handleChangeAllowRepeats" text="Не допускать повторы" />
-      <HBox alignment="CENTER">
+      <HBox alignment="CENTER" spacing="5.0">
          <children>
             <Label fx:id="sameNumberLabel" text="Всегда показывать числа" />
-            <TextField fx:id="sameNumberField" alignment="CENTER" prefHeight="32.0" prefWidth="40.0" style="-fx-border-color: white; -fx-border-width: 0 0 1 0;" />
+            <Pane fx:id="numberRangeHelpIcon" maxHeight="12.0" maxWidth="12.0" onMouseClicked="#handleShowHelpBox" styleClass="help-icon">
+               <children>
+                  <SVGPath content="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm1.25 17c0 .69-.559 1.25-1.25 1.25-.689 0-1.25-.56-1.25-1.25s.561-1.25 1.25-1.25c.691 0 1.25.56 1.25 1.25zm1.393-9.998c-.608-.616-1.515-.955-2.551-.955-2.18 0-3.59 1.55-3.59 3.95h2.011c0-1.486.829-2.013 1.538-2.013.634 0 1.307.421 1.364 1.226.062.847-.39 1.277-.962 1.821-1.412 1.343-1.438 1.993-1.432 3.468h2.005c-.013-.664.03-1.203.935-2.178.677-.73 1.519-1.638 1.536-3.022.011-.924-.284-1.719-.854-2.297z" scaleX="0.5" scaleY="0.5" translateX="-6.0" translateY="-6.0" />
+               </children>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Pane>
+            <TextField fx:id="sameNumberField" alignment="CENTER" prefHeight="32.0" prefWidth="50.0" style="-fx-border-color: white; -fx-border-width: 0 0 1 0;" />
          </children>
       </HBox>
    </children>

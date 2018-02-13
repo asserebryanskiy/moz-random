@@ -40,7 +40,7 @@ public class GeneratorController {
     private static final String SOUND_SVG_PATH = "M5 17h-5v-10h5v10zm2-10v10l9 5v-20l-9 5zm17 4h-5v2h5v-2zm-1.584-6.232l-4.332 2.5 1 1.732 4.332-2.5-1-1.732zm1 12.732l-4.332-2.5-1 1.732 4.332 2.5 1-1.732z";
     private static final String SCALE_SVG_PATH = "M6.426 10.668l-3.547-3.547-2.879 2.879v-10h10l-2.879 2.879 3.547 3.547-4.242 4.242zm11.148 2.664l3.547 3.547 2.879-2.879v10h-10l2.879-2.879-3.547-3.547 4.242-4.242zm-6.906 4.242l-3.547 3.547 2.879 2.879h-10v-10l2.879 2.879 3.547-3.547 4.242 4.242zm2.664-11.148l3.547-3.547-2.879-2.879h10v10l-2.879-2.879-3.547 3.547-4.242-4.242z";
     private static final String UNSCALE_SVG_PATH = "M16.586 19.414l-2.586 2.586v-8h8l-2.586 2.586 4.586 4.586-2.828 2.828-4.586-4.586zm-13.758-19.414l-2.828 2.828 4.586 4.586-2.586 2.586h8v-8l-2.586 2.586-4.586-4.586zm16.586 7.414l2.586 2.586h-8v-8l2.586 2.586 4.586-4.586 2.828 2.828-4.586 4.586zm-19.414 13.758l2.828 2.828 4.586-4.586 2.586 2.586v-8h-8l2.586 2.586-4.586 4.586z";
-    private static final double TEXT_HEIGHT_RATIO = 75d/190d;  // ratio of text height relative to video height
+    private static final double TEXT_HEIGHT_RATIO = 100d/190d;  // ratio of text height relative to video height
     private static final String MUSIC_SRC = "/media/fort-boyard-monety.mp3";
     private static final String VIDEO_SRC = "/media/moz.mp4";
     private static final String ABSENT_VALUE = "no_value"; // if we no value for alwaysSameNumbers was specified
@@ -213,8 +213,6 @@ public class GeneratorController {
 
             // change size of the text
             double newFontSize = window.getHeight() * TEXT_HEIGHT_RATIO;
-            System.out.println(window.getHeight());
-            System.out.println(newFontSize);
             if (!Double.isNaN(newFontSize)) number.setStyle("-fx-font-size:" + newFontSize);
             number.setTranslateY(newFontSize * 0.15);   // because it runs into logo if not
         }

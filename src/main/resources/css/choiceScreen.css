@@ -42,12 +42,14 @@
     -fx-background-color: standard-background-color;
 }
 
-#btnNext {
+#btnNext,
+.help-icon > * {
     -fx-fill: rgb(255,255,255);
     -fx-cursor: hand;
 }
 
-#btnNext:hover {
+#btnNext:hover,
+.help-icon:hover > * {
     -fx-fill: rgba(255,255,255, 0.5);
 }
 

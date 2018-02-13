@@ -14,6 +14,7 @@ public class GeneratorScreenMock extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         Font.loadFont(getClass().getResourceAsStream("/fonts/CRC35.OTF"), 13);
+        Font.loadFont(getClass().getResourceAsStream("/fonts/CIRCE-EXTRABOLD.OTF"), 13);
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Generator.fxml"));
         Parent root = loader.load();
         GeneratorController controller = loader.getController();
