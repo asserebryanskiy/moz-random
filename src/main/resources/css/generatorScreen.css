@@ -6,8 +6,6 @@
 #number {
     -fx-text-fill: white;
     -fx-font-family: "Circe Extra Bold";
-    -fx-border-color: red;
-    -fx-border-width: 2px;
 }
 
 .svgPane {
