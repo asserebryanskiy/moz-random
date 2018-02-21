@@ -4,6 +4,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -16,6 +17,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
@@ -42,9 +44,10 @@ public class GeneratorController {
     private static final String UNSCALE_SVG_PATH = "M16.586 19.414l-2.586 2.586v-8h8l-2.586 2.586 4.586 4.586-2.828 2.828-4.586-4.586zm-13.758-19.414l-2.828 2.828 4.586 4.586-2.586 2.586h8v-8l-2.586 2.586-4.586-4.586zm16.586 7.414l2.586 2.586h-8v-8l2.586 2.586 4.586-4.586 2.828 2.828-4.586 4.586zm-19.414 13.758l2.828 2.828 4.586-4.586 2.586 2.586v-8h-8l2.586 2.586-4.586 4.586z";
     private static final double TEXT_HEIGHT_RATIO = 90.0/190.0;  // ratio of text height relative to video height
     private static final String MUSIC_SRC = "/media/fort-boyard-monety.mp3";
-    private static final String VIDEO_SRC = "/media/moz.mp4";
+    private static final String VIDEO_SRC = "/media/grayVideo.mp4";
     private static final String ABSENT_VALUE = "no_value"; // if we no value for alwaysSameNumbers was specified
     private static final int NUMBER_CHANGE_FREQ = 100;   // duration in millis after which random number changes
+    private static final boolean ADDITIONAL_SETTINGS = true;    // indicates if additional settings should be counted
 
     public StackPane root;
     public MediaView mediaView;
@@ -127,6 +130,9 @@ public class GeneratorController {
             play();
         });
 
+        if (ADDITIONAL_SETTINGS) {
+            ((VBox) number.getParent()).setAlignment(Pos.CENTER);
+        }
     }
 
     private void positionNodes() {
@@ -212,9 +218,14 @@ public class GeneratorController {
             }
 
             // change size of the text
-            double newFontSize = window.getHeight() * TEXT_HEIGHT_RATIO;
+            double newFontSize;
+            if (ADDITIONAL_SETTINGS) {
+                newFontSize = window.getHeight() * 3.0 / 5.0;
+            } else {
+                newFontSize = window.getHeight() * TEXT_HEIGHT_RATIO;
+                number.setTranslateY(newFontSize * 0.25);   // because it runs into logo if not
+            }
             if (!Double.isNaN(newFontSize)) number.setStyle("-fx-font-size:" + newFontSize);
-            number.setTranslateY(newFontSize * 0.25);   // because it runs into logo if not
         }
     }
 

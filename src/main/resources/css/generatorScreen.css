@@ -3,9 +3,16 @@
     gray-color: rgb(124,121,121);
 }
 
+
 #number {
+    /* base settings */
+    /*-fx-text-fill: white;
+    -fx-font-family: "Circe Extra Bold";*/
+
+    /* additional settings */
     -fx-text-fill: white;
-    -fx-font-family: "Circe Extra Bold";
+    -fx-font-family: Arial;
+    -fx-font-weight: Bold;
 }
 
 .svgPane {
