@@ -28,8 +28,8 @@ public class RandomGeneratorTest {
         RandomGenerator generator = new RandomGenerator(0, 100, true);
         Set<Integer> result = new HashSet<>();
 
-        for (int i = 0; i < 100; i++) result.add(generator.generateWithoutRepeats());
+        for (int i = 0; i <= 100; i++) result.add(generator.generateWithoutRepeats());
 
-        assertThat(result.size(), is(100));
+        assertThat(result.size(), is(101));
     }
 }

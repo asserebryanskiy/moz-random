@@ -6,13 +6,13 @@
 
 #number {
     /* base settings */
-    /*-fx-text-fill: white;
-    -fx-font-family: "Circe Extra Bold";*/
+    -fx-text-fill: white;
+    -fx-font-family: "Circe Extra Bold";
 
     /* additional settings */
-    -fx-text-fill: white;
+    /*-fx-text-fill: white;
     -fx-font-family: Arial;
-    -fx-font-weight: Bold;
+    -fx-font-weight: Bold;*/
 }
 
 .svgPane {

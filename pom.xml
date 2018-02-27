@@ -26,7 +26,7 @@
                     <mainClass>Main</mainClass>
                     <vendor>company</vendor>
                     <appName>moz-random</appName>
-                    <bundler>PKG</bundler>
+                    <bundler>exe</bundler>
                     <verbose>true</verbose>
                 </configuration>
                 <executions>

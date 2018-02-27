@@ -44,10 +44,10 @@ public class GeneratorController {
     private static final String UNSCALE_SVG_PATH = "M16.586 19.414l-2.586 2.586v-8h8l-2.586 2.586 4.586 4.586-2.828 2.828-4.586-4.586zm-13.758-19.414l-2.828 2.828 4.586 4.586-2.586 2.586h8v-8l-2.586 2.586-4.586-4.586zm16.586 7.414l2.586 2.586h-8v-8l2.586 2.586 4.586-4.586 2.828 2.828-4.586 4.586zm-19.414 13.758l2.828 2.828 4.586-4.586 2.586 2.586v-8h-8l2.586 2.586-4.586 4.586z";
     private static final double TEXT_HEIGHT_RATIO = 90.0/190.0;  // ratio of text height relative to video height
     private static final String MUSIC_SRC = "/media/fort-boyard-monety.mp3";
-    private static final String VIDEO_SRC = "/media/grayVideo.mp4";
+    private static final String VIDEO_SRC = "/media/moz.mp4";
     private static final String ABSENT_VALUE = "no_value"; // if we no value for alwaysSameNumbers was specified
     private static final int NUMBER_CHANGE_FREQ = 100;   // duration in millis after which random number changes
-    private static final boolean ADDITIONAL_SETTINGS = true;    // indicates if additional settings should be counted
+    private static final boolean ADDITIONAL_SETTINGS = false;    // indicates if additional settings should be counted
 
     public StackPane root;
     public MediaView mediaView;
