@@ -11,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -42,15 +43,16 @@ public class GeneratorController {
     private static final String SOUND_SVG_PATH = "M5 17h-5v-10h5v10zm2-10v10l9 5v-20l-9 5zm17 4h-5v2h5v-2zm-1.584-6.232l-4.332 2.5 1 1.732 4.332-2.5-1-1.732zm1 12.732l-4.332-2.5-1 1.732 4.332 2.5 1-1.732z";
     private static final String SCALE_SVG_PATH = "M6.426 10.668l-3.547-3.547-2.879 2.879v-10h10l-2.879 2.879 3.547 3.547-4.242 4.242zm11.148 2.664l3.547 3.547 2.879-2.879v10h-10l2.879-2.879-3.547-3.547 4.242-4.242zm-6.906 4.242l-3.547 3.547 2.879 2.879h-10v-10l2.879 2.879 3.547-3.547 4.242 4.242zm2.664-11.148l3.547-3.547-2.879-2.879h10v10l-2.879-2.879-3.547 3.547-4.242-4.242z";
     private static final String UNSCALE_SVG_PATH = "M16.586 19.414l-2.586 2.586v-8h8l-2.586 2.586 4.586 4.586-2.828 2.828-4.586-4.586zm-13.758-19.414l-2.828 2.828 4.586 4.586-2.586 2.586h8v-8l-2.586 2.586-4.586-4.586zm16.586 7.414l2.586 2.586h-8v-8l2.586 2.586 4.586-4.586 2.828 2.828-4.586 4.586zm-19.414 13.758l2.828 2.828 4.586-4.586 2.586 2.586v-8h-8l2.586 2.586-4.586 4.586z";
-    private static final double TEXT_HEIGHT_RATIO = 90.0/190.0;  // ratio of text height relative to video height
+    private static final double TEXT_HEIGHT_RATIO = 1.0/4.0;  // ratio of text height relative to video height
     private static final String MUSIC_SRC = "/media/fort-boyard-monety.mp3";
-    private static final String VIDEO_SRC = "/media/moz.mp4";
+    private static final String VIDEO_SRC = "/media/moz-short.mp4";
     private static final String ABSENT_VALUE = "no_value"; // if we no value for alwaysSameNumbers was specified
     private static final int NUMBER_CHANGE_FREQ = 100;   // duration in millis after which random number changes
     private static final boolean ADDITIONAL_SETTINGS = false;    // indicates if additional settings should be counted
 
     public StackPane root;
     public MediaView mediaView;
+    public ImageView bgImage;
     public Pane backBtn;
     public Label number;
     public Button startBtn;
@@ -87,9 +89,10 @@ public class GeneratorController {
 
         positionNodes();
 
-        // set up video
-        media = new Media(getClass().getResource(VIDEO_SRC).toExternalForm());
-        prepareVideo();
+        // set up background
+        prepareImageBackground();
+//        media = new Media(getClass().getResource(VIDEO_SRC).toExternalForm());
+//        prepareVideo();
 
         // set up sound
         audio = new MediaPlayer(new Media(getClass().getResource(MUSIC_SRC).toExternalForm()));
@@ -125,7 +128,8 @@ public class GeneratorController {
             });*/
             root.maxWidthProperty().bind(stage.widthProperty());
             root.maxHeightProperty().bind(stage.heightProperty());
-            stage.heightProperty().addListener((obs, n, o) -> correctVideoSize(media));
+            stage.heightProperty().addListener((obs, n, o) -> correctImageSize(bgImage));
+//            stage.heightProperty().addListener((obs, n, o) -> correctVideoSize(media));
             stage.setWidth(stage.getWidth() + 1);
             play();
         });
@@ -133,6 +137,10 @@ public class GeneratorController {
         if (ADDITIONAL_SETTINGS) {
             ((VBox) number.getParent()).setAlignment(Pos.CENTER);
         }
+    }
+
+    private void prepareImageBackground() {
+
     }
 
     private void positionNodes() {
@@ -198,6 +206,66 @@ public class GeneratorController {
         mediaView.setMediaPlayer(video);
     }
 
+    private void correctImageSize(ImageView bgImage) {
+        Window window = root.getScene().getWindow();
+        if (window != null) {
+            boolean fitWidth = true;
+
+            if (fitWidth) {
+                // if both video width and height are bigger we set height and then move video on X axis
+                double ratio = window.getWidth() / bgImage.getBoundsInLocal().getWidth();
+                // scale to the size of the screen
+                bgImage.setFitWidth(window.getWidth());
+                double newFitHeight = bgImage.getBoundsInLocal().getHeight() * ratio;
+                // if video width is now smaller than window width, set its width to the window's width
+                if (newFitHeight < window.getHeight()) {
+                    bgImage.setFitHeight(window.getHeight());
+                    bgImage.setFitWidth(bgImage.getBoundsInLocal().getWidth()
+                            * (window.getHeight() / bgImage.getBoundsInLocal().getHeight()));
+                    double translateX = window.getWidth() - bgImage.getBoundsInLocal().getWidth();
+                    double translateY = window.getHeight() - bgImage.getBoundsInLocal().getHeight();
+                    System.out.println(translateX);
+                    System.out.println(translateY);
+                    bgImage.setTranslateX(translateX);
+                    bgImage.setTranslateY(translateY);
+                } else {
+                    bgImage.setFitHeight(newFitHeight);
+                    // center on Y axis
+                    bgImage.setLayoutY((window.getHeight() - newFitHeight) / 2);
+                }
+            } else {
+                // if both video width and height are bigger we set height and then move video on X axis
+                double ratio = window.getHeight() / bgImage.getBoundsInLocal().getHeight();
+                // scale to the size of the screen
+                bgImage.setFitHeight(window.getHeight());
+                double newFitWidth = bgImage.getBoundsInLocal().getWidth() * ratio;
+                // if video width is now smaller than window width, set its width to the window's width
+                if (newFitWidth < window.getWidth()) {
+                    bgImage.setFitWidth(window.getWidth());
+                    bgImage.setFitHeight(bgImage.getBoundsInLocal().getHeight()
+                            * (window.getWidth() / bgImage.getBoundsInLocal().getWidth()));
+                    bgImage.setLayoutX(0);
+                } else {
+                    bgImage.setFitWidth(newFitWidth);
+                    // center on X axis
+                    bgImage.setLayoutX((window.getWidth() - newFitWidth) / 2);
+                }
+            }
+
+
+            // change size of the text
+            double newFontSize;
+            if (ADDITIONAL_SETTINGS) {
+                newFontSize = window.getHeight() * 3.0 / 5.0;
+            } else {
+                newFontSize = window.getHeight() * TEXT_HEIGHT_RATIO;
+                // because it runs into logo if not
+//                number.setTranslateY(window.getHeight() / 2 - newFontSize);
+            }
+            if (!Double.isNaN(newFontSize)) number.setStyle("-fx-font-size:" + newFontSize);
+        }
+    }
+
     private void correctVideoSize(Media media) {
         Window window = root.getScene().getWindow();
         if (window != null) {
@@ -231,8 +299,8 @@ public class GeneratorController {
 
     private void play() {
         run = true;
-        video.seek(Duration.ZERO);
-        video.play();
+//        video.seek(Duration.ZERO);
+//        video.play();
         audio.play();
         animation.play();
         startBtn.setText("Остановить");
@@ -240,7 +308,7 @@ public class GeneratorController {
 
     private void stop() {
         run = false;
-        video.pause();
+//        video.pause();
         audio.stop();
         // animation is stopped in the scene event filter, because of strange bug
         // with delay of number change to alwaysSameNumbers. Change of number text
