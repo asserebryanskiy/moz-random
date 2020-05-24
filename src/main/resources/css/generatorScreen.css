@@ -3,16 +3,14 @@
     gray-color: rgba(124,121,121, 0.4);
 }
 
+#numberBack {
+    -fx-background-color: black;
+}
 
 #number {
     /* base settings */
     -fx-text-fill: white;
     -fx-font-family: "Circe Extra Bold";
-
-    /* additional settings */
-    /*-fx-text-fill: white;
-    -fx-font-family: Arial;
-    -fx-font-weight: Bold;*/
 }
 
 .svgPane {
