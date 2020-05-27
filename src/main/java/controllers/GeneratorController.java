@@ -40,7 +40,7 @@ public class GeneratorController {
     private static final String SCALE_SVG_PATH = "M6.426 10.668l-3.547-3.547-2.879 2.879v-10h10l-2.879 2.879 3.547 3.547-4.242 4.242zm11.148 2.664l3.547 3.547 2.879-2.879v10h-10l2.879-2.879-3.547-3.547 4.242-4.242zm-6.906 4.242l-3.547 3.547 2.879 2.879h-10v-10l2.879 2.879 3.547-3.547 4.242 4.242zm2.664-11.148l3.547-3.547-2.879-2.879h10v10l-2.879-2.879-3.547 3.547-4.242-4.242z";
     private static final String UNSCALE_SVG_PATH = "M16.586 19.414l-2.586 2.586v-8h8l-2.586 2.586 4.586 4.586-2.828 2.828-4.586-4.586zm-13.758-19.414l-2.828 2.828 4.586 4.586-2.586 2.586h8v-8l-2.586 2.586-4.586-4.586zm16.586 7.414l2.586 2.586h-8v-8l2.586 2.586 4.586-4.586 2.828 2.828-4.586 4.586zm-19.414 13.758l2.828 2.828 4.586-4.586 2.586 2.586v-8h-8l2.586 2.586-4.586 4.586z";
     private static final String MUSIC_SRC = "/media/fort-boyard-monety.mp3";
-    private static final double TEXT_HEIGHT_RATIO = 1.0/4.0;  // ratio of text height relative to video height
+    private static final double TEXT_HEIGHT_RATIO = 1.0/3.0;  // ratio of text height relative to video height
     private static final int NUMBER_CHANGE_FREQ = 100;   // duration in millis after which random number changes
 
     public StackPane root;
